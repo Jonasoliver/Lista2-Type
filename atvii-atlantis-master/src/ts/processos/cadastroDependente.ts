@@ -4,26 +4,37 @@ import Cliente from "../modelos/cliente";
 import Armazem from "../dominio/armazem";
 
 export default class CadastrarDependente extends Processo {
-    protected titular!: Cliente;  // Use 'protected' se você precisar acessá-la na subclasse
-    protected entrada = new Entrada();  // Use 'protected' se necessário
+    protected entrada = new Entrada();
 
-    constructor(titular: Cliente) {
+    constructor() {
         super();
-        this.titular = titular;  // Atribui o titular passado como argumento
     }
 
     processar(): void {
         console.log("Cadastro de Dependente");
 
-        // Recebendo dados do dependente
-        let nome = this.entrada.receberTexto("Digite o nome do dependente:");
-        let nomeSocial = this.entrada.receberTexto("Digite o nome social do dependente:");
-        let dataNascimento = this.entrada.receberData("Digite a data de nascimento do dependente:");
+        // Solicita o nome do titular
+        const nomeTitular = this.entrada.receberTexto("Digite o nome do titular para associar o dependente:");
 
-        // Criando e adicionando o dependente
-        let dependente = new Cliente(nome, nomeSocial, dataNascimento);
-        dependente.setTitular(this.titular); // Define o titular do dependente
-        this.titular.Dependentes.push(dependente); // Adiciona o dependente ao titular
+        // Busca o titular pelo nome no armazém de clientes
+        const titular = Armazem.InstanciaUnica.Clientes.find(
+            (cliente: Cliente) => cliente.Nome === nomeTitular
+        );
+
+        if (!titular) {
+            console.log("Titular não encontrado.");
+            return;
+        }
+
+        // Recebendo dados do dependente
+        const nome = this.entrada.receberTexto("Digite o nome do dependente:");
+        const nomeSocial = this.entrada.receberTexto("Digite o nome social do dependente:");
+        const dataNascimento = this.entrada.receberData("Digite a data de nascimento do dependente:");
+
+        // Criando e associando o dependente ao titular encontrado
+        const dependente = new Cliente(nome, nomeSocial, dataNascimento);
+        dependente.setTitular(titular); // Define o titular do dependente
+        titular.Dependentes.push(dependente); // Adiciona o dependente ao titular
 
         console.log("Dependente cadastrado com sucesso!");
     }

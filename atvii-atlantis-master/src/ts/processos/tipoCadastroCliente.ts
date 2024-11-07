@@ -23,7 +23,8 @@ export default class TipoCadastroCliente extends Processo {
                 this.processo.processar();
                 break;
             case 2:
-                this.processo = new CadastrarDependente(this.clienteTitular); // Passe o cliente titular
+                this.processo = new CadastrarDependente(); // Agora sem argumento
+
                 this.processo.processar();
                 break;
             default:
